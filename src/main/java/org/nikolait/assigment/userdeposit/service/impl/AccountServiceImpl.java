@@ -52,8 +52,8 @@ public class AccountServiceImpl implements AccountService {
         Long firstId = min(fromUserId, toUserId);
         Long secondId = max(fromUserId, toUserId);
 
-        Account firstAccount = getUserAccountForUpdate(firstId);
-        Account secondAccount = getUserAccountForUpdate(secondId);
+        Account firstAccount = getUserAccountWithLock(firstId);
+        Account secondAccount = getUserAccountWithLock(secondId);
 
         Account fromAccount = (firstId.equals(fromUserId)) ? firstAccount : secondAccount;
         Account toAccount = (firstId.equals(toUserId)) ? firstAccount : secondAccount;
@@ -69,7 +69,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void accrueInterest(Long userId) {
-        Account account = getUserAccountForUpdate(userId);
+        Account account = getUserAccountWithLock(userId);
 
         BigDecimal deposit = account.getDeposit();
         BigDecimal capitalization = account.getCapitalization();
@@ -90,10 +90,10 @@ public class AccountServiceImpl implements AccountService {
         account.setBalance(balance.add(accruals));
     }
 
-    private Account getUserAccountForUpdate(Long userId) {
-        return accountRepository.findByUserIdForUpdate(userId)
+    private Account getUserAccountWithLock(Long userId) {
+        return accountRepository.findByUserIdWithLock(userId)
                 .orElseThrow(() -> new EntityNotFoundException(
-                        String.format("Account for User with id %d not found", userId)
+                        "Account for User with id %d not found".formatted(userId)
                 ));
     }
 
