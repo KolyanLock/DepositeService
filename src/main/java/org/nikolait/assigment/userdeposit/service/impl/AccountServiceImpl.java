@@ -78,7 +78,7 @@ public class AccountServiceImpl implements AccountService {
         BigDecimal maxLimit = account.getDeposit().multiply(depositeConfig.getMaxRate());
 
         if (capitalization.compareTo(maxLimit) > 0) {
-            log.error("Capitalization limit exceeded for user with id {}", userId);
+            log.info("Capitalization limit exceeded for user with id {}", userId);
             return;
         }
 
