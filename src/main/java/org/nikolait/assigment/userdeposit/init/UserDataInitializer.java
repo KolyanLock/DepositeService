@@ -23,9 +23,6 @@ public class UserDataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        userRepository.deleteAll();
-        userEsRepository.deleteAll();
-
         if (userRepository.count() == 0) {
             new ResourceDatabasePopulator(new ClassPathResource("sql/init_user_data.sql")).execute(dataSource);
         }
