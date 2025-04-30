@@ -40,7 +40,7 @@ public class AccountServiceImpl implements AccountService {
      * и использовать Redis Lock, если планируется масштабирование
      */
     @Override
-    @Transactional
+    @Transactional(timeout = 10)
     public void transfer(Long fromUserId, Long toUserId, BigDecimal amount) {
         if (fromUserId.equals(toUserId)) {
             throw new TransferException("Cannot transfer money to yourself");
