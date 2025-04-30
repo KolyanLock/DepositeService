@@ -82,4 +82,28 @@ class AccountControllerTest extends IntegrationTestBase {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("Перевод суммы, равной 0, должен быть отклонён")
+    void transferFunds_zeroAmount_shouldReturnBadRequest() throws Exception {
+        BigDecimal transferAmount = BigDecimal.ZERO;
+
+        mockMvc.perform(post("/api/v1/user/account/transfer")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new TransferRequest(user2Id, transferAmount))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Перевод отрицательной суммы должен быть отклонён")
+    void transferFunds_negativeAmount_shouldReturnBadRequest() throws Exception {
+        BigDecimal transferAmount = new BigDecimal("-10.00");
+
+        mockMvc.perform(post("/api/v1/user/account/transfer")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new TransferRequest(user2Id, transferAmount))))
+                .andExpect(status().isBadRequest());
+    }
+
 }

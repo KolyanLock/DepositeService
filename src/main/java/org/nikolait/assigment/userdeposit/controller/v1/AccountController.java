@@ -1,6 +1,7 @@
 package org.nikolait.assigment.userdeposit.controller.v1;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.nikolait.assigment.userdeposit.dto.AccountResponse;
 import org.nikolait.assigment.userdeposit.dto.TransferRequest;
@@ -25,7 +26,7 @@ public class AccountController {
     }
 
     @PostMapping("/transfer")
-    public void transferFunds(@RequestBody TransferRequest request) {
+    public void transferFunds(@RequestBody @Valid TransferRequest request) {
         Long fromUserId = SecurityUtils.getCurrentUserId();
         accountService.transfer(fromUserId, request.getUserId(), request.getValue());
     }
