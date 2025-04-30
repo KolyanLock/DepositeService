@@ -4,8 +4,8 @@
 
 ## Требования
 - Java 21
-- Maven/Gradle
-- Docker + Docker Compose
+- Maven 3.9.x
+- Docker + Docker Compose (Docker Desktop будет достаточно)
 
 ## Настройка
 1. Создайте `.env` файл в корне проекта:
