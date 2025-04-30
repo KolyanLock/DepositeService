@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
         if (fromUserId.equals(toUserId)) {
             throw new TransferException("Cannot transfer money to yourself");
         }
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than 0");
         }
 
