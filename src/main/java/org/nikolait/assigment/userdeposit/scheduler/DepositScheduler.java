@@ -3,7 +3,6 @@ package org.nikolait.assigment.userdeposit.scheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nikolait.assigment.userdeposit.repository.UserRepository;
-import org.nikolait.assigment.userdeposit.service.AccountService;
 import org.nikolait.assigment.userdeposit.service.TransactionService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,8 +19,12 @@ public class DepositScheduler {
      * В пределах 100_000 пользователей точно безопасно findAllIds.
      * Если пользователей миллионы, тогда можно stream или порциями.
      */
-    @Scheduled(fixedRateString = "${deposit.scheduler-interval}")
+    @Scheduled(
+            fixedRateString = "${deposit.scheduler-interval}",
+            initialDelayString = "${deposit.scheduler-init-delay}"
+    )
     public void triggerAccrual() {
+        log.info("Starting DepositScheduler triggerAccrual >>>");
         userRepository.findAllIds().forEach(userId -> {
             try {
                 transactionService.accrueInterest(userId);
@@ -29,6 +32,7 @@ public class DepositScheduler {
                 log.error("Failed to accrue interest for user with id {}", userId, e);
             }
         });
+        log.info("Finished DepositScheduler triggerAccrual <<<");
     }
 
 }

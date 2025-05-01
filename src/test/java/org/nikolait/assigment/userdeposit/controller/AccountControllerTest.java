@@ -3,15 +3,11 @@ package org.nikolait.assigment.userdeposit.controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nikolait.assigment.userdeposit.IntegrationTestBase;
-import org.nikolait.assigment.userdeposit.dto.TransferRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import java.math.BigDecimal;
-
 import static org.nikolait.assigment.userdeposit.util.TestConstants.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
