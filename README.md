@@ -50,6 +50,12 @@
     java -jar target/UserDepositeService-0.0.1-SNAPSHOT.jar
     ```
 
+## Swagger UI
+- После запуска сервиса доступен Swagger UI по адресу:  
+  <http://localhost:8080/swagger-ui/index.html>
+- Данные пользователей можно посмотреть в файле:  
+  `src/main/resources/sql/init_user_data.sql`
+
 ## Пояснение
 Для того чтобы правильно работал планировщик пополнения баланса при запуске
 нескольких экземпляров сервиса понадобится настроить Quartz Job Scheduler для небольшого 
