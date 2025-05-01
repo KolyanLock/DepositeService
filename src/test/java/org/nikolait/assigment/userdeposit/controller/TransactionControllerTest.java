@@ -292,6 +292,18 @@ class TransactionControllerTest extends IntegrationTestBase {
     }
 
     @Test
+    @DisplayName("Перевод средств самому не существующему пользователю должен быть отклонён")
+    void transferFunds_toNonExistentUser() throws Exception {
+        BigDecimal transferAmount = BigDecimal.valueOf(50.00);
+
+        mockMvc.perform(post("/api/v1/transaction/transfer/init")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new TransferRequest(999999999L, transferAmount))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("Перевод суммы больше баланса должен быть отклонён")
     void transferFunds_insufficientBalance() throws Exception {
         BigDecimal transferAmount = BigDecimal.valueOf(USER1_BALANCE + 0.01);

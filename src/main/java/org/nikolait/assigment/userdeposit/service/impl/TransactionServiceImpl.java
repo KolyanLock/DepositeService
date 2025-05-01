@@ -9,7 +9,7 @@ import org.nikolait.assigment.userdeposit.entity.Transaction;
 import org.nikolait.assigment.userdeposit.exception.TransferException;
 import org.nikolait.assigment.userdeposit.repository.AccountRepository;
 import org.nikolait.assigment.userdeposit.repository.TransactionRepository;
-import org.nikolait.assigment.userdeposit.security.util.SecurityUtils;
+import org.nikolait.assigment.userdeposit.repository.UserRepository;
 import org.nikolait.assigment.userdeposit.service.TransactionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +29,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
     private final DepositeConfig depositeConfig;
 
     @Override
@@ -39,6 +40,9 @@ public class TransactionServiceImpl implements TransactionService {
         }
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than 0");
+        }
+        if (!userRepository.existsById(toUserId)) {
+            throw new EntityNotFoundException("Recipient user with id %d not found".formatted(toUserId));
         }
 
         Account fromAccount = getAccount(fromUserId);
