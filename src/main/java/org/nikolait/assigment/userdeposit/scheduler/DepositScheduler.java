@@ -19,8 +19,12 @@ public class DepositScheduler {
      * В пределах 100_000 пользователей точно безопасно findAllIds.
      * Если пользователей миллионы, тогда можно stream или порциями.
      */
-    @Scheduled(fixedRateString = "${deposit.scheduler-interval}")
+    @Scheduled(
+            fixedRateString = "${deposit.scheduler-interval}",
+            initialDelayString = "${deposit.scheduler-init-delay}"
+    )
     public void triggerAccrual() {
+        log.info("Starting DepositScheduler triggerAccrual >>>");
         userRepository.findAllIds().forEach(userId -> {
             try {
                 accountService.accrueInterest(userId);
@@ -28,6 +32,7 @@ public class DepositScheduler {
                 log.error("Failed to accrue interest for user with id {}", userId, e);
             }
         });
+        log.info("Finished DepositScheduler triggerAccrual <<<");
     }
 
 }
