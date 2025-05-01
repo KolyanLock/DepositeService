@@ -29,12 +29,12 @@ public class AccountController {
 
     @PostMapping("/transfer")
     public void transferFunds(@RequestBody @Valid TransferRequest request) {
-        Long fromUserId = SecurityUtils.getCurrentUserId();
         try {
+            Long fromUserId = SecurityUtils.getCurrentUserId();
             accountService.transfer(fromUserId, request.getUserId(), request.getValue());
         } catch (Exception e) {
-            log.error("Executing transfer from user id {} to user id {} for amount {}: {}, {} failed!",
-                    fromUserId, request.getUserId(), request.getValue(), e.getClass().getName(), e.getMessage());
+            log.error("Executing transfer to user id {} for amount {} failed! Error: {}, message: {}",
+                   request.getUserId(), request.getValue(), e.getClass().getName(), e.getMessage(), e);
             throw e;
         }
     }
