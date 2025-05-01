@@ -53,7 +53,7 @@
  - После запуска сервиса доступен Swagger UI по адресу:  
    <http://localhost:8080/swagger-ui/index.html>
  - Данные пользователей можно посмотреть в файле:  
-`src/main/resources/sql/init_user_data.sql`
+   `src/main/resources/sql/init_user_data.sql`
 
 
 
