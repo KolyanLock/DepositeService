@@ -7,7 +7,7 @@ import org.nikolait.assigment.userdeposit.IntegrationTestBase;
 import org.nikolait.assigment.userdeposit.entity.Account;
 import org.nikolait.assigment.userdeposit.repository.AccountRepository;
 import org.nikolait.assigment.userdeposit.scheduler.DepositScheduler;
-import org.nikolait.assigment.userdeposit.service.AccountService;
+import org.nikolait.assigment.userdeposit.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.nikolait.assigment.userdeposit.util.TestConstants.*;
 
-class AccountConcurrentTest extends IntegrationTestBase {
+class TransactionConcurrentTest extends IntegrationTestBase {
 
     private static final int TOTAL_THEAD_COUNT = 8;
     private static final int TRANSFER_THEAD_COUNT = 6;
@@ -41,6 +41,15 @@ class AccountConcurrentTest extends IntegrationTestBase {
 
     private static ExecutorService executorService;
 
+    @Autowired
+    private DepositScheduler depositScheduler;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
     @BeforeEach
     void initExecutor() {
         executorService = Executors.newFixedThreadPool(TOTAL_THEAD_COUNT);
@@ -50,16 +59,6 @@ class AccountConcurrentTest extends IntegrationTestBase {
     void tearDown() {
         executorService.shutdownNow();
     }
-
-
-    @Autowired
-    private DepositScheduler depositScheduler;
-
-    @Autowired
-    private AccountService accountService;
-
-    @Autowired
-    private AccountRepository accountRepository;
 
     @Test
     void concurrentTransfersWithAccrual_shouldMaintainCorrectBalances() throws Exception {
@@ -147,9 +146,12 @@ class AccountConcurrentTest extends IntegrationTestBase {
         for (int i = 0; i < TRANSFER_THEAD_COUNT; i++) {
             futures.add(executorService.submit(() -> {
                 for (int j = 0; j < TRANSFERS_PER_THREAD; j++) {
-                    accountService.transfer(user1Id, user2Id, TRANSFER_12_AMOUNT);
-                    accountService.transfer(user2Id, user3Id, TRANSFER_23_AMOUNT);
-                    accountService.transfer(user3Id, user1Id, TRANSFER_31_AMOUNT);
+                    Long transactionId1 = transactionService.initTransfer(user1Id, user2Id, TRANSFER_12_AMOUNT).getId();
+                    transactionService.commitTransfer(transactionId1, user1Id);
+                    Long transactionId2 = transactionService.initTransfer(user2Id, user3Id, TRANSFER_23_AMOUNT).getId();
+                    transactionService.commitTransfer(transactionId2, user2Id);
+                    Long transactionId3 = transactionService.initTransfer(user3Id, user1Id, TRANSFER_31_AMOUNT).getId();
+                    transactionService.commitTransfer(transactionId3, user3Id);
                 }
             }));
         }

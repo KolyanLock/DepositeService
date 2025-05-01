@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nikolait.assigment.userdeposit.repository.UserRepository;
 import org.nikolait.assigment.userdeposit.service.AccountService;
+import org.nikolait.assigment.userdeposit.service.TransactionService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DepositScheduler {
 
-    private final AccountService accountService;
+    private final TransactionService transactionService;
     private final UserRepository userRepository;
 
     /**
@@ -23,7 +24,7 @@ public class DepositScheduler {
     public void triggerAccrual() {
         userRepository.findAllIds().forEach(userId -> {
             try {
-                accountService.accrueInterest(userId);
+                transactionService.accrueInterest(userId);
             } catch (Exception e) {
                 log.error("Failed to accrue interest for user with id {}", userId, e);
             }

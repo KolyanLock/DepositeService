@@ -7,6 +7,7 @@ import org.nikolait.assigment.userdeposit.config.DepositeConfig;
 import org.nikolait.assigment.userdeposit.entity.Account;
 import org.nikolait.assigment.userdeposit.repository.AccountRepository;
 import org.nikolait.assigment.userdeposit.service.AccountService;
+import org.nikolait.assigment.userdeposit.service.TransactionService;
 import org.nikolait.assigment.userdeposit.util.TestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,10 +15,10 @@ import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class AccountServiceTest extends IntegrationTestBase {
+class TransactionServiceTest extends IntegrationTestBase {
 
     @Autowired
-    private AccountService accountService;
+    private TransactionService transactionService;
 
     @Autowired
     private AccountRepository accountRepository;
@@ -35,7 +36,7 @@ class AccountServiceTest extends IntegrationTestBase {
 
         assertThat(expectedAccrual).isLessThan(maxRate);
 
-        accountService.accrueInterest(user1Id);
+        transactionService.accrueInterest(user1Id);
 
         Account updated = accountRepository.findByUserId(user1Id).orElseThrow();
 
@@ -46,7 +47,7 @@ class AccountServiceTest extends IntegrationTestBase {
     @Test
     @DisplayName("Не начисляются средства для user3 с нулевым депозитом")
     void accrueInterestNoChangeForUserWithZeroDeposit() {
-        accountService.accrueInterest(user3Id);
+        transactionService.accrueInterest(user3Id);
 
         Account updated = accountRepository.findByUserId(user3Id).orElseThrow();
         assertThat(updated.getCapitalization()).isEqualByComparingTo(BigDecimal.ZERO);
@@ -66,7 +67,7 @@ class AccountServiceTest extends IntegrationTestBase {
         account.setBalance(account.getBalance().add(accruals));
         accountRepository.save(account);
 
-        accountService.accrueInterest(user1Id);
+        transactionService.accrueInterest(user1Id);
 
         Account updated = accountRepository.findByUserId(user1Id).orElseThrow();
         assertThat(updated.getCapitalization()).isEqualByComparingTo(maxLimit);
