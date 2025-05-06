@@ -15,8 +15,8 @@ CREATE TABLE account
 (
     id             BIGSERIAL PRIMARY KEY,
     user_id        BIGINT         NOT NULL UNIQUE REFERENCES "user" (id),
-    deposit        NUMERIC(19, 2) NOT NULL CHECK (balance >= 0),
-    capitalization NUMERIC(19, 2) NOT NULL CHECK (balance >= 0),
+    deposit        NUMERIC(19, 2) NOT NULL CHECK (deposit >= 0),
+    capitalization NUMERIC(19, 2) NOT NULL CHECK (capitalization >= 0),
     balance        NUMERIC(19, 2) NOT NULL CHECK (balance >= 0)
 );
 
