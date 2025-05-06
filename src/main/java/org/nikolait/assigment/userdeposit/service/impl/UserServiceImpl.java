@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getCurrentUserFetchPhoneData() {
-        return userRepository.findByIdFetchFetchPhoneData(SecurityUtils.getCurrentUserId()).orElseThrow(() ->
+        return userRepository.findByIdFetchPhoneData(SecurityUtils.getCurrentUserId()).orElseThrow(() ->
                 new IllegalStateException("Current User not found in the database"));
     }
 

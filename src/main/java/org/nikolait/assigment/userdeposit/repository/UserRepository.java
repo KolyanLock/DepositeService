@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = "phones")
     @Query("SELECT u FROM User u WHERE u.id = :id")
-    Optional<User> findByIdFetchFetchPhoneData(Long id);
+    Optional<User> findByIdFetchPhoneData(Long id);
 
     @EntityGraph(attributePaths = {"emails", "phones"})
     @Query("SELECT u FROM User u WHERE u.id = :id")
