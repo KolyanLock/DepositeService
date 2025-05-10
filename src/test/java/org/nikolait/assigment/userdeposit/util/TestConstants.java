@@ -16,7 +16,6 @@ public class TestConstants {
     public static final String USER1_PASSWORD = "ivanov@1993-05-01!";
     public static final String USER1_DATE_OF_BIRTH = "1993-05-01";
     public static final double USER1_DEPOSIT = 1000.00;
-    public static final double USER1_CAPITALIZATION = 0.00;
     public static final double USER1_BALANCE = 1000.00;
 
     // User 2: Мария Петрова
@@ -26,7 +25,6 @@ public class TestConstants {
     public static final String USER2_PASSWORD = "petrova@1988-11-23!";
     public static final String USER2_DATE_OF_BIRTH = "1988-11-23";
     public static final double USER2_DEPOSIT = 250.50;
-    public static final double USER2_CAPITALIZATION = 0.00;
     public static final double USER2_BALANCE = 250.50;
 
     // User 3: Сергей Сидоров
@@ -36,7 +34,6 @@ public class TestConstants {
     public static final String USER3_PASSWORD = "sidorov@2000-02-14!";
     public static final String USER3_DATE_OF_BIRTH = "2000-02-14";
     public static final double USER3_DEPOSIT = 0.00;
-    public static final double USER3_CAPITALIZATION = 0.00;
     public static final double USER3_BALANCE = 0.00;
 
 }
