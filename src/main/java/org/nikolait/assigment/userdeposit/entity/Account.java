@@ -30,9 +30,6 @@ public class Account {
     private BigDecimal deposit;
 
     @Column(nullable = false)
-    private BigDecimal capitalization;
-
-    @Column(nullable = false)
     private BigDecimal balance;
 
 }

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 public record AccountResponse(
         BigDecimal deposit,
-        BigDecimal capitalization,
         BigDecimal balance
 ) {
 }

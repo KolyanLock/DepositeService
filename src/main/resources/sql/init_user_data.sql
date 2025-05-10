@@ -6,8 +6,8 @@ VALUES ('Иван Иванов', '1993-05-01', '$2a$10$3xlUksXZuXABUaLUm4WgSuDCw
     RETURNING id
     ), ins_account AS (
 INSERT
-INTO account(user_id, deposit, capitalization, balance)
-SELECT id, 1000.00, 0.00, 1000.00
+INTO account(user_id, deposit, balance)
+SELECT id, 1000.00, 1000.00
 FROM new_user
     ), ins_email AS (
 INSERT
@@ -31,8 +31,8 @@ VALUES ('Мария Петрова', '1988-11-23', '$2a$10$uFjNWC7xNmzE9nnzg2JYj
     RETURNING id
     ), ins_account AS (
 INSERT
-INTO account(user_id, deposit, capitalization, balance)
-SELECT id, 250.50, 0.00, 250.50
+INTO account(user_id, deposit, balance)
+SELECT id, 250.50, 250.50
 FROM new_user
     ), ins_email AS (
 INSERT
@@ -53,8 +53,8 @@ VALUES ('Сергей Сидоров', '2000-02-14', '$2a$10$ebJdv9ygqSvofizWpFq
     RETURNING id
     ), ins_account AS (
 INSERT
-INTO account(user_id, deposit, capitalization, balance)
-SELECT id, 0.00, 0.00, 0.00
+INTO account(user_id, deposit, balance)
+SELECT id, 0.00, 0.00
 FROM new_user
     ), ins_email AS (
 INSERT

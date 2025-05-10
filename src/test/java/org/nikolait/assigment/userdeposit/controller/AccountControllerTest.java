@@ -6,6 +6,7 @@ import org.nikolait.assigment.userdeposit.IntegrationTestBase;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.nikolait.assigment.userdeposit.util.TestConstants.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,8 +21,8 @@ class AccountControllerTest extends IntegrationTestBase {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*", hasSize(2)))
                 .andExpect(jsonPath("$.deposit").value(USER1_DEPOSIT))
-                .andExpect(jsonPath("$.capitalization").value(USER1_CAPITALIZATION))
                 .andExpect(jsonPath("$.balance").value(USER1_BALANCE));
     }
 

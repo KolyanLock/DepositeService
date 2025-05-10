@@ -107,21 +107,21 @@ public class TransactionServiceImpl implements TransactionService {
         Account account = getUserAccountWithLock(userId);
 
         BigDecimal deposit = account.getDeposit();
-        BigDecimal capitalization = account.getCapitalization();
         BigDecimal balance = account.getBalance();
-        BigDecimal accruals = deposit.multiply(depositeConfig.getInterestRate());
-        BigDecimal maxLimit = account.getDeposit().multiply(depositeConfig.getMaxRate());
+        BigDecimal maxLimit = deposit.multiply(depositeConfig.getMaxRate());
 
-        if (capitalization.compareTo(maxLimit) > 0) {
-            log.info("Capitalization limit exceeded for user with id {}", userId);
+        if (balance.compareTo(maxLimit) >= 0) {
+            log.info("Limit reached for User with id {}", userId);
             return;
         }
 
-        if (capitalization.add(accruals).compareTo(maxLimit) > 0) {
-            accruals = maxLimit.subtract(capitalization);
+        BigDecimal accruals = balance.multiply(depositeConfig.getInterestRate());
+
+        if (balance.add(accruals).compareTo(maxLimit) >= 0) {
+            account.setBalance(maxLimit);
+            return;
         }
 
-        account.setCapitalization(capitalization.add(accruals));
         account.setBalance(balance.add(accruals));
     }
 
