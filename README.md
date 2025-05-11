@@ -22,7 +22,9 @@
     JWT_SECRET=jwt_секрет
     ```
 
-2. Для запуска приложения без `Dockerfile` создайте файл `src/main/resources/secret/secret.properties`.
+2. Для запуска приложения без `Dockerfile`:
+
+   Создайте файл `src/main/resources/secret/secret.properties`.
    `JWT_SECRET` - необязательный дополнительный параметр,
    если не задать будет использоваться дефолтное значение, но это не безопасно.
    Можно также задать эти свойства как переменные окружения в конфигурации запуска IDEA.
@@ -55,14 +57,14 @@
       ```
 
 5. Сборка и запуск приложения с помощью Dockerfile
-   - сборка docker-образа
-     ```bash
-     docker build -t user_deposit_app .
-     ```
-   - запуск контейнера
-     ```bash
-     docker run --env-file .env --name user_deposit_app_container -p 8080:8080 -d user_deposit_app
-     ```
+    - сборка docker-образа
+      ```bash
+      docker build -t user_deposit_app .
+      ```
+    - запуск контейнера
+      ```bash
+      docker run --env-file .env --name user_deposit_app_container -p 8080:8080 -d user_deposit_app
+      ```
 
 ## Swagger UI
 
