@@ -107,22 +107,24 @@ public class TransactionServiceImpl implements TransactionService {
         Account account = getUserAccountWithLock(userId);
 
         BigDecimal deposit = account.getDeposit();
-        BigDecimal balance = account.getBalance();
+        BigDecimal oldBalance = account.getBalance();
         BigDecimal maxLimit = deposit.multiply(depositeConfig.getMaxRate());
 
-        if (balance.compareTo(maxLimit) >= 0) {
-            log.info("Limit reached for User with id {}", userId);
+        if (oldBalance.compareTo(maxLimit) >= 0) {
+            log.info("User id {}, deposit {}, limit {} reached!", userId, deposit, maxLimit);
             return;
         }
 
-        BigDecimal accruals = balance.multiply(depositeConfig.getInterestRate());
+        BigDecimal accruals = oldBalance.multiply(depositeConfig.getInterestRate());
 
-        if (balance.add(accruals).compareTo(maxLimit) >= 0) {
+        if (oldBalance.add(accruals).compareTo(maxLimit) >= 0) {
             account.setBalance(maxLimit);
             return;
         }
 
-        account.setBalance(balance.add(accruals));
+        BigDecimal newBalance = oldBalance.add(accruals);
+        account.setBalance(newBalance);
+        log.info("User id {} balance {} -> {}", userId, oldBalance, newBalance);
     }
 
     private Transaction getUserTransferTransactionWithLock(Long id, Long userId) {
