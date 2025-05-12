@@ -19,6 +19,7 @@ import java.time.Instant;
 
 import static java.lang.Long.max;
 import static java.lang.Long.min;
+import static java.math.RoundingMode.HALF_EVEN;
 import static org.nikolait.assigment.userdeposit.emum.TransactionStatus.*;
 import static org.nikolait.assigment.userdeposit.emum.TransactionType.TRANSFER;
 
@@ -108,14 +109,16 @@ public class TransactionServiceImpl implements TransactionService {
 
         BigDecimal deposit = account.getDeposit();
         BigDecimal oldBalance = account.getBalance();
-        BigDecimal maxLimit = deposit.multiply(depositeConfig.getMaxRate());
+        BigDecimal maxLimit = deposit.multiply(depositeConfig.getMaxRate())
+                .setScale(2, HALF_EVEN);
 
         if (oldBalance.compareTo(maxLimit) >= 0) {
             log.info("User id {}, deposit {}, limit {} reached!", userId, deposit, maxLimit);
             return;
         }
 
-        BigDecimal accruals = oldBalance.multiply(depositeConfig.getInterestRate());
+        BigDecimal accruals = oldBalance.multiply(depositeConfig.getInterestRate())
+                .setScale(2, HALF_EVEN);
 
         if (oldBalance.add(accruals).compareTo(maxLimit) >= 0) {
             account.setBalance(maxLimit);

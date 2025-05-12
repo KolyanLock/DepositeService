@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
+import static java.math.RoundingMode.HALF_EVEN;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionServiceTest extends IntegrationTestBase {
@@ -28,8 +29,8 @@ class TransactionServiceTest extends IntegrationTestBase {
     void accrueInterestForDepositeAccount() {
         Account before = accountRepository.findByUserId(user1Id).orElseThrow();
         BigDecimal balanceBefore = before.getBalance();
-        BigDecimal maxLimit = before.getDeposit().multiply(depositeConfig.getMaxRate());
-        BigDecimal accrual = balanceBefore.multiply(depositeConfig.getInterestRate());
+        BigDecimal maxLimit = before.getDeposit().multiply(depositeConfig.getMaxRate()).setScale(2, HALF_EVEN);
+        BigDecimal accrual = balanceBefore.multiply(depositeConfig.getInterestRate()).setScale(2, HALF_EVEN);
 
         BigDecimal expectedBalance = balanceBefore.add(accrual).min(maxLimit);
 
