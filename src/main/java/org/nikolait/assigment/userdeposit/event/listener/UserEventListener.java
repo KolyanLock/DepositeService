@@ -12,6 +12,7 @@ import org.nikolait.assigment.userdeposit.mapper.UserMapper;
 import org.nikolait.assigment.userdeposit.repository.UserEsRepository;
 import org.nikolait.assigment.userdeposit.repository.UserRepository;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -27,6 +28,7 @@ public class UserEventListener {
     private final EmailMapper emailMapper;
     private final PhoneMapper phoneMapper;
 
+    @Async
     @EventListener
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEmailDataEvent(EmailDataEvent event) {
@@ -42,6 +44,7 @@ public class UserEventListener {
         userEsRepository.save(userEs);
     }
 
+    @Async
     @EventListener
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEmailDataEvent(PhoneDataEvent event) {

@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 
 import java.util.stream.Stream;
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.nikolait.assigment.userdeposit.util.TestConstants.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,13 +30,12 @@ class PhoneControllerTest extends IntegrationTestBase {
                 )
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/v1/user/phone")
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/user/phone")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[*].phone", hasItem(TestConstants.USER1_NEW_PHONE)));
+                .andExpect(jsonPath("$[*].phone", hasItem(TestConstants.USER1_NEW_PHONE))));
     }
 
     @Test
@@ -72,14 +72,13 @@ class PhoneControllerTest extends IntegrationTestBase {
                 )
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/user/phone")
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/user/phone")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].phone", hasItem(USER1_NEW_PHONE)))
-                .andExpect(jsonPath("$[*].phone", not(hasItem(oldPhone))));
+                .andExpect(jsonPath("$[*].phone", not(hasItem(oldPhone)))));
     }
 
     @Test
@@ -105,13 +104,12 @@ class PhoneControllerTest extends IntegrationTestBase {
                 )
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/user/phone")
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/user/phone")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[*].phone", not(hasItem(USER1_PHONE))));
+                .andExpect(jsonPath("$[*].phone", not(hasItem(USER1_PHONE)))));
     }
 
     @Test

@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.nikolait.assigment.userdeposit.IntegrationTestBase;
 import org.nikolait.assigment.userdeposit.dto.EmailRequest;
 import org.nikolait.assigment.userdeposit.elastic.EmailDataEs;
-import org.nikolait.assigment.userdeposit.util.TestConstants;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import java.util.stream.Stream;
 
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.nikolait.assigment.userdeposit.util.TestConstants.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -29,13 +29,12 @@ class EmailControllerTest extends IntegrationTestBase {
                 )
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/api/v1/user/email")
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/user/email")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[*].email", hasItem(TestConstants.USER1_NEW_EMAIL)));
+                .andExpect(jsonPath("$[*].email", hasItem(USER1_NEW_EMAIL))));
     }
 
     @Test
@@ -44,7 +43,7 @@ class EmailControllerTest extends IntegrationTestBase {
         mockMvc.perform(post("/api/v1/user/email")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new EmailRequest(TestConstants.USER2_EMAIL)))
+                        .content(objectMapper.writeValueAsString(new EmailRequest(USER2_EMAIL)))
                 )
                 .andExpect(status().isConflict());
     }
@@ -72,14 +71,13 @@ class EmailControllerTest extends IntegrationTestBase {
                 )
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/user/email")
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/user/email")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[*].email", hasItem(USER1_NEW_EMAIL)))
-                .andExpect(jsonPath("$[*].email", not(hasItem(oldEmail))));
+                .andExpect(jsonPath("$[*].email", not(hasItem(oldEmail)))));
     }
 
     @Test
@@ -105,13 +103,12 @@ class EmailControllerTest extends IntegrationTestBase {
                 )
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/user/email")
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/user/email")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + user1AccessToken)
-                        .accept(MediaType.APPLICATION_JSON)
-                )
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[*].email", not(hasItem(USER1_EMAIL))));
+                .andExpect(jsonPath("$[*].email", not(hasItem(USER1_EMAIL)))));
     }
 
     @Test
