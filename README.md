@@ -42,7 +42,7 @@
     docker-compose up -d
     ```
 
-4. Сборка и запуск приложения без Dockerfile:
+4. Сборка и запуск приложения (используйте флаг `-Pno-docker-image` если не хотите собирать Docker-образ):
     - сборка и запуск тестов
         ```bash
         mvn clean package
@@ -51,19 +51,23 @@
       ```bash
       mvn clean package -DskipTests
       ```
-    - запуск jar-файла приложения
+    - запуск контейнера
       ```bash
-      java -jar target/UserDepositeService-0.0.1-SNAPSHOT.jar
+      docker run --env-file .env --name user_deposit_app --restart unless-stopped -p 8080:8080 -d user-deposit-service:0.0.1-SNAPSHOT
+      ```
+    - запуск jar-файла приложения без контейнера
+      ```bash
+      java -jar target/user-deposit-service-0.0.1-SNAPSHOT.jar
       ```
 
-5. Сборка и запуск приложения с помощью Dockerfile
+5. Сборка и запуск приложения с помощью Dockerfile без Java и Maven в системе:
     - сборка docker-образа
       ```bash
-      docker build -t user_deposit_app .
+      docker build -t user-deposit-service-multi-s:0.0.1-SNAPSHOT .
       ```
     - запуск контейнера
       ```bash
-      docker run --env-file .env --name user_deposit_app_container -p 8080:8080 -d user_deposit_app
+      docker run --env-file .env --name user_deposit_app --restart unless-stopped -p 8080:8080 -d user-deposit-service-multi-s:0.0.1-SNAPSHOT
       ```
 
 ## Swagger UI
@@ -75,7 +79,7 @@
 
 ## Заметки
 
-Для блокировки планировщиков при запуске нескольких экземпляров приложения используется 
+Для блокировки планировщиков при запуске нескольких экземпляров приложения используется
 упрощённый вариант через advisory lock. Можно вместо него настроить Quartz Job Scheduler для небольшого
 количества одновременно запущенных экземпляров или Redis + Scheduled Lock
 для большого количества экземпляров. Готов реализовать, если требуется.
