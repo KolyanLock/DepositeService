@@ -20,8 +20,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        return userRepository.findByEmailFetchEmailData(login)
-                .or(() -> userRepository.findByPhoneFetchPhoneData(login))
+        return userRepository.findByEmail(login)
+                .or(() -> userRepository.findByPhone(login))
                 .map(user -> new CustomUserDetails(user.getId(), login, user.getPassword()))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

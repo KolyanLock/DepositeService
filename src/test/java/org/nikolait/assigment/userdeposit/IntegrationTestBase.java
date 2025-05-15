@@ -72,9 +72,9 @@ public abstract class IntegrationTestBase {
         List<User> users = userRepository.findAll();
         assertEquals(3, users.size());
 
-        user1Id = userRepository.findByEmailFetchEmailData(USER1_EMAIL).get().getId();
-        user2Id = userRepository.findByEmailFetchEmailData(USER2_EMAIL).get().getId();
-        user3Id = userRepository.findByEmailFetchEmailData(USER3_EMAIL).get().getId();
+        user1Id = userRepository.findByEmail(USER1_EMAIL).get().getId();
+        user2Id = userRepository.findByEmail(USER2_EMAIL).get().getId();
+        user3Id = userRepository.findByEmail(USER3_EMAIL).get().getId();
 
         user1AccessToken = authHelper.getAccessToken(USER1_EMAIL, USER1_PASSWORD);
         user2AccessToken = authHelper.getAccessToken(USER2_EMAIL, USER2_PASSWORD);

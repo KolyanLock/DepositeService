@@ -10,11 +10,11 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT DISTINCT u FROM User u JOIN FETCH u.emails e WHERE e.email = :login")
-    Optional<User> findByEmailFetchEmailData(String login);
+    @Query("SELECT u FROM User u JOIN u.emails e WHERE e.email = :email")
+    Optional<User> findByEmail(String email);
 
-    @Query("SELECT DISTINCT u FROM User u JOIN FETCH u.phones p WHERE p.phone = :login")
-    Optional<User> findByPhoneFetchPhoneData(String login);
+    @Query("SELECT u FROM User u JOIN u.phones p WHERE p.phone = :phone")
+    Optional<User> findByPhone(String phone);
 
     @EntityGraph(attributePaths = "emails")
     @Query("SELECT u FROM User u WHERE u.id = :id")
