@@ -31,5 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Added ###
 /.env
 /src/main/resources/secret/
+/k8s/
