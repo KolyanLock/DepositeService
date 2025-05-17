@@ -1,4 +1,4 @@
-name: user_deposite_stack
+name: user_deposite_containers
 
 services:
   postgres:
@@ -14,9 +14,10 @@ services:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER}" ]
-      interval: 10s
+      start_period: 10s
       timeout: 5s
       retries: 5
+      interval: 10s
     restart: unless-stopped
 
   elasticsearch:
@@ -36,10 +37,33 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     healthcheck:
-      test: [ "CMD-SHELL", "curl -s http://localhost:9200/_cluster/health?pretty | grep -q '\"status\" : \"green\"'" ]
-      interval: 10s
+      test: [ "CMD-SHELL", "[ $$(curl -s -o /dev/null -w '%{http_code}' -u elastic:$${ELASTIC_PASSWORD} http://localhost:9200) = 200 ]" ]
+      start_period: 30s
       timeout: 5s
       retries: 5
+      interval: 10s
+    restart: unless-stopped
+
+  user_deposite_app:
+    image: user-deposit-service:${VERSION}
+    container_name: user_deposite_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      # Spring Datasource
+      DB_URL: ${DB_URL}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Elasticsearch
+      ES_URIS: ${ES_URIS}
+      ES_PASSWORD: ${ES_PASSWORD}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8080:8080"
     restart: unless-stopped
 
 volumes:

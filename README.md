@@ -14,6 +14,8 @@
 1. Создайте `.env` файл в корне проекта:
 
     ```properties
+    # Версия приложения из pom.xml version
+    VERSION=0.0.1-SNAPSHOT
     DB_URL=jdbc:postgresql://host.docker.internal:5432/user_deposite_db
     DB_USER=postgres_логин
     DB_PASSWORD=postgres_пароль
@@ -22,27 +24,7 @@
     JWT_SECRET=jwt_секрет
     ```
 
-2. Для запуска приложения без `Dockerfile`:
-
-   Создайте файл `src/main/resources/secret/secret.properties`.
-   `JWT_SECRET` - необязательный дополнительный параметр,
-   если не задать будет использоваться дефолтное значение, но это не безопасно.
-   Можно также задать эти свойства как переменные окружения в конфигурации запуска IDEA.
-   ```properties
-    DB_URL=jdbc:postgresql://localhost:5432/user_deposite_db
-    DB_USER=postgres_логин
-    DB_PASSWORD=postgres_пароль
-    ES_URIS=http://localhost:9200
-    ES_PASSWORD=elastic_пароль
-    JWT_SECRET=jwt_секрет
-    ```
-
-3. Запустите контейнеры с PostgreSQL и Elasticsearch
-    ```bash
-    docker-compose up -d
-    ```
-
-4. Сборка и запуск приложения (используйте флаг `-Pno-docker-image` если не хотите собирать Docker-образ):
+2. Сборка и запуск приложения (используйте флаг `-Pno-docker-image` если не хотите собирать Docker-образ):
     - сборка и запуск тестов
         ```bash
         mvn clean package
@@ -60,7 +42,27 @@
       java -jar target/user-deposit-service-0.0.1-SNAPSHOT.jar
       ```
 
-5. Сборка и запуск приложения с помощью Dockerfile без Java и Maven в системе:
+3. Запустите контейнеры (требуется Docker-образ из п. 2):
+    ```bash
+    docker-compose up -d
+    ```
+
+4. Для запуска приложения без `Dockerfile`:
+
+   Создайте файл `src/main/resources/secret/secret.properties`.
+   `JWT_SECRET` - необязательный дополнительный параметр,
+   если не задать будет использоваться дефолтное значение, но это не безопасно.
+   Можно также задать эти свойства как переменные окружения в конфигурации запуска IDEA.
+   ```properties
+    DB_URL=jdbc:postgresql://localhost:5432/user_deposite_db
+    DB_USER=postgres_логин
+    DB_PASSWORD=postgres_пароль
+    ES_URIS=http://localhost:9200
+    ES_PASSWORD=elastic_пароль
+    JWT_SECRET=jwt_секрет
+    ```
+
+5. Сборка и запуск приложения в контейнере с помощью Dockerfile без Java и Maven в системе:
     - сборка docker-образа
       ```bash
       docker build -t user-deposit-service-multi-s:0.0.1-SNAPSHOT .
@@ -83,4 +85,3 @@
 упрощённый вариант через advisory lock. Можно вместо него настроить Quartz Job Scheduler для небольшого
 количества одновременно запущенных экземпляров или Redis + Scheduled Lock
 для большого количества экземпляров. Готов реализовать, если требуется.
-Запуск полностью через docker-compose тоже могу сделать.
