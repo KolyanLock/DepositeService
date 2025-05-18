@@ -172,13 +172,6 @@
                         </exclude>
                     </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build-image-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -218,7 +211,7 @@
 
     <profiles>
         <profile>
-            <id>no-docker-image</id>
+            <id>docker-image</id>
             <build>
                 <plugins>
                     <plugin>
@@ -229,9 +222,6 @@
                                 <goals>
                                     <goal>build-image-no-fork</goal>
                                 </goals>
-                                <configuration>
-                                    <skip>true</skip>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

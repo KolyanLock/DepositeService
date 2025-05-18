@@ -1,9 +1,9 @@
-name: user_deposite_containers
+name: user-deposit-stack
 
 services:
   postgres:
     image: postgres:17-alpine
-    container_name: user_deposite_pg
+    container_name: user-deposit-pg
     environment:
       POSTGRES_DB: user_deposite_db
       POSTGRES_USER: ${DB_USER}
@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${DB_USER}" ]
       start_period: 10s
@@ -22,7 +22,7 @@ services:
 
   elasticsearch:
     image: elastic/elasticsearch:7.17.10
-    container_name: user_deposite_es
+    container_name: user-deposit-es
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=true
@@ -35,7 +35,7 @@ services:
     ports:
       - "9200:9200"
     volumes:
-      - es_data:/usr/share/elasticsearch/data
+      - es-data:/usr/share/elasticsearch/data
     healthcheck:
       test: [ "CMD-SHELL", "[ $$(curl -s -o /dev/null -w '%{http_code}' -u elastic:$${ELASTIC_PASSWORD} http://localhost:9200) = 200 ]" ]
       start_period: 30s
@@ -44,9 +44,12 @@ services:
       interval: 10s
     restart: unless-stopped
 
-  user_deposite_app:
+  user-deposit-app:
     image: user-deposit-service:${VERSION}
-    container_name: user_deposite_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-deposit-app
     depends_on:
       postgres:
         condition: service_healthy
@@ -67,5 +70,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  pg_data:
-  es_data:
+  pg-data:
+  es-data:
