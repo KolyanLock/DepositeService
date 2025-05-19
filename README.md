@@ -44,6 +44,11 @@
     ES_PASSWORD=elastic_пароль
     JWT_SECRET=jwt_секрет
     ```
+   Можете сами создать PostreSQL и Elasticsearch БД или использовать
+    ```bash
+    docker-compose-local up -d
+    ```
+   запустит только БД PostreSQL и Elasticsearch в Docker.
 
 4. Сборка и запуск приложения без контейнера
    (используйте флаг `-Pdocker-image` если хотите собирать Docker-образ с помощью Maven):
