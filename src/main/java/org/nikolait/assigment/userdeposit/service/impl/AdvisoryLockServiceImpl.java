@@ -24,25 +24,19 @@ public class AdvisoryLockServiceImpl implements AdvisoryLockService {
 
     @Override
     public boolean tryLock(AdvisoryLockType lockType) {
-        try {
-            Connection connection = connectionRef.updateAndGet(c -> getConnection(c, lockType));
+        Connection connection = connectionRef.updateAndGet(c -> getConnection(c, lockType));
 
-            if (connection == null) {
-                return false;
-            }
-
-            if (tryAdvisoryLock(lockType.getKey(), connection)) {
-                log.info("Lock {} acquired", lockType);
-                return true;
-            }
-
-            log.debug("Lock {} not acquired", lockType);
-            return false;
-
-        } catch (SQLException e) {
-            log.error("Failed to acquire lock {}", lockType, e);
+        if (connection == null) {
             return false;
         }
+
+        if (tryAdvisoryLock(lockType, connection)) {
+            log.info("Lock {} acquired", lockType);
+            return true;
+        }
+
+        log.debug("Lock {} not acquired", lockType);
+        return false;
     }
 
     @Override
@@ -67,14 +61,17 @@ public class AdvisoryLockServiceImpl implements AdvisoryLockService {
         return c;
     }
 
-    private boolean tryAdvisoryLock(long lockKey, Connection connection) throws SQLException {
+    private boolean tryAdvisoryLock(AdvisoryLockType lockType, Connection connection) {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "SELECT pg_try_advisory_lock(?)")
         ) {
-            stmt.setLong(1, lockKey);
+            stmt.setLong(1, lockType.getKey());
             ResultSet rs = stmt.executeQuery();
             rs.next();
             return rs.getBoolean(1);
+        } catch (SQLException e) {
+            log.error("Failed to acquire lock {}", lockType, e);
+            return false;
         }
     }
 
