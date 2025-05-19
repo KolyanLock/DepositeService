@@ -12,8 +12,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
@@ -23,23 +21,19 @@ public class AdvisoryLockServiceImpl implements AdvisoryLockService {
 
     private final DataSource dataSource;
     private final AtomicReference<Connection> connectionRef = new AtomicReference<>();
-    private final Set<AdvisoryLockType> acquiredLocks = ConcurrentHashMap.newKeySet();
 
     @Override
-    public boolean tryAcquirePermanentLock(AdvisoryLockType lockType) {
-        if (acquiredLocks.contains(lockType)) {
-            return true;
-        }
+    public boolean tryLock(AdvisoryLockType lockType) {
         try {
             Connection connection = connectionRef.updateAndGet(c -> getConnection(c, lockType));
-            if (tryAdvisoryLock(lockType.getKey(), connection)) {
-                acquiredLocks.add(lockType);
-                log.info("Lock {} acquired", lockType);
-                return true;
-            }
 
             if (connection == null) {
                 return false;
+            }
+
+            if (tryAdvisoryLock(lockType.getKey(), connection)) {
+                log.info("Lock {} acquired", lockType);
+                return true;
             }
 
             log.debug("Lock {} not acquired", lockType);
@@ -51,12 +45,20 @@ public class AdvisoryLockServiceImpl implements AdvisoryLockService {
         }
     }
 
+    @Override
+    public void releaseLock(AdvisoryLockType lockType) {
+        Connection connection = connectionRef.get();
+        if (connection == null) {
+            log.warn("Connection is null while releasing lock {}", lockType);
+            return;
+        }
+        releaseAdvisoryLock(lockType, connection);
+    }
+
     private Connection getConnection(Connection c, AdvisoryLockType lockType) {
         try {
             if (c == null || c.isClosed()) {
-                Connection connection = dataSource.getConnection();
-                connection.setAutoCommit(true);
-                return connection;
+                return dataSource.getConnection();
             }
         } catch (SQLException e) {
             log.error("Failed to open connection for lock {}", lockType, e);
@@ -76,17 +78,27 @@ public class AdvisoryLockServiceImpl implements AdvisoryLockService {
         }
     }
 
+    private void releaseAdvisoryLock(AdvisoryLockType lockType, Connection connection) {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT pg_advisory_unlock(?)"
+        )) {
+            ps.setLong(1, lockType.getKey());
+            ps.execute();
+            log.info("Lock {} released", lockType);
+        } catch (SQLException e) {
+            log.error("Failed to release lock {}", lockType, e);
+        }
+    }
+
     @PreDestroy
     public void close() {
         Connection connection = connectionRef.getAndSet(null);
         if (connection != null) {
             try {
                 connection.close();
-                log.info("Connection closed, {} locks released", acquiredLocks.size());
+                log.info("Connection closed, locks released");
             } catch (SQLException e) {
                 log.error("Error closing connection", e);
-            } finally {
-                acquiredLocks.clear();
             }
         }
     }

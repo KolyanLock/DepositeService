@@ -28,7 +28,7 @@ public class DepositScheduler {
             initialDelayString = "${deposit.scheduler-init-delay}"
     )
     public void triggerAccrual() {
-        if (!lockService.tryAcquirePermanentLock(TRIGGER_ACCRUAL)) {
+        if (!lockService.tryLock(TRIGGER_ACCRUAL)) {
             return;
         }
         log.info("Starting DepositScheduler triggerAccrual >>>");
