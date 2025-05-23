@@ -30,42 +30,42 @@
       Это можно сделать за 1 шаг, если у вас установлен `Docker Desktop` просто активируйте Kubernetes `Kubeadm` в
       настройках.
     - Создайте Docker-образ любым из указанных ниже способов:
-   ```bash
-   mvn clean package -DskipTests -Pdocker-image
-   ```
-   ```bash
-   docker build -t user-deposit-service:0.0.1-SNAPSHOT .
-   ```
+      ```bash
+      mvn clean package -DskipTests -Pdocker-image
+      ```
+      ```bash
+      docker build -t user-deposit-service:0.0.1-SNAPSHOT .
+      ```
 
     - Создайте файл в папке проекта `k8s/user-deposit-secrets.yaml`:
-   ```yaml
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      name: user-deposit-secrets
-    type: Opaque
-    stringData:
-      DB_USER: "ваш_postgres_юзер"
-      DB_PASSWORD: "ваш_postgres_пароль"
-      ES_PASSWORD: "ваш_elastic_пароль"
-      JWT_SECRET: "ваш_jwt_секрет"
-    ```
+      ```yaml
+       apiVersion: v1
+       kind: Secret
+       metadata:
+         name: user-deposit-secrets
+       type: Opaque
+       stringData:
+         DB_USER: "ваш_postgres_юзер"
+         DB_PASSWORD: "ваш_postgres_пароль"
+         ES_PASSWORD: "ваш_elastic_пароль"
+         JWT_SECRET: "ваш_jwt_секрет"
+       ```
 
     - Если у вас не очень мощный процессор отрегулируйте настройки в `k8s/user-deposit-app-deployment.yaml`:
-   ```yaml
-    resources:
-      requests:
-        cpu: 100m
-      limits:
-        cpu: 500m
-    metrics:
-      - type: Resource
-        resource:
-          name: cpu
-        target:
-          type: AverageValue
-          averageValue: 10m
-    ```
+      ```yaml
+       resources:
+         requests:
+           cpu: 100m
+         limits:
+           cpu: 500m
+      metrics:
+         - type: Resource
+           resource:
+             name: cpu
+           target:
+             type: AverageValue
+             averageValue: 10m
+       ```
 
     - Находясь в корне проекта выполните команду:
       ```bash
