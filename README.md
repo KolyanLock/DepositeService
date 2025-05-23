@@ -25,9 +25,19 @@
     docker-compose up -d
     ```
 
-3. Запуск в кластере Kubernetes (кластер должен быть создан `kubectl` установлена и подключена к нему):
+3. Запуск в кластере Kubernetes:
+    - Создайте кластер Kubernetes, установите `kubectl` и подключитесь к кластеру.
+      Это можно сделать за 1 шаг, если у вас установлен `Docker Desktop` просто активируйте Kubernetes `Kubeadm` в
+      настройках.
+    - Создайте Docker-образ любым из указанных ниже способов:
+   ```bash
+   mvn clean package -DskipTests -Pdocker-image
+   ```
+   ```bash
+   docker build -t user-deposit-service:0.0.1-SNAPSHOT .
+   ```
 
-    - создайте файл в папке проекта `k8s/user-deposit-secrets.yaml`:
+    - Создайте файл в папке проекта `k8s/user-deposit-secrets.yaml`:
    ```yaml
     apiVersion: v1
     kind: Secret
@@ -41,7 +51,7 @@
       JWT_SECRET: "ваш_jwt_секрет"
     ```
 
-    - если у вас не очень мощный процессор отрегулируйте настройки в `k8s/user-deposit-app-deployment.yaml`:
+    - Если у вас не очень мощный процессор отрегулируйте настройки в `k8s/user-deposit-app-deployment.yaml`:
    ```yaml
     resources:
       requests:
@@ -57,7 +67,7 @@
           averageValue: 10m
     ```
 
-    - находясь в корне проекта выполните команду:
+    - Находясь в корне проекта выполните команду:
       ```bash
       kubectl apply -f ./k8s/
       ```
