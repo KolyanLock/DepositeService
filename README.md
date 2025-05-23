@@ -5,23 +5,19 @@
 
 ## Требования
 
-- Java 21 (опционально)
-- Maven 3.9.x (опционально)
-- Docker + Docker Compose (Docker Desktop будет достаточно)
+- Java 21 и Maven 3.9.x (опционально)
+- Docker + Docker Compose (Docker Desktop будет достаточно) | Kubernetes кластер
 
 ## Настройка
 
 1. Создайте `.env` файл в корне проекта:
-
     ```properties
-    # Версия приложения из pom.xml version
-    VERSION=0.0.1-SNAPSHOT
     DB_URL=jdbc:postgresql://host.docker.internal:5432/user_deposite_db
-    DB_USER=postgres_логин
-    DB_PASSWORD=postgres_пароль
+    DB_USER=ваш_postgres_юзер
+    DB_PASSWORD=ваш_postgres_пароль
     ES_URIS=http://host.docker.internal:9200
-    ES_PASSWORD=elastic_пароль
-    JWT_SECRET=jwt_секрет
+    ES_PASSWORD=ваш_elastic_пароль
+    JWT_SECRET=ваш_jwt_секрет
     ```
 
 2. Быстрый запуск всего сразу с `docker-compose` (Docker-образ будет собран из `Dockerfile`, если отсутствует):
@@ -29,7 +25,44 @@
     docker-compose up -d
     ```
 
-3. Для запуска приложения без `Dockerfile`:
+3. Запуск в кластере Kubernetes (кластер должен быть создан `kubectl` установлена и подключена к нему):
+
+    - создайте файл в папке проекта `k8s/user-deposit-secrets.yaml`:
+   ```yaml
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: user-deposit-secrets
+    type: Opaque
+    stringData:
+      DB_USER: "ваш_postgres_юзер"
+      DB_PASSWORD: "ваш_postgres_пароль"
+      ES_PASSWORD: "ваш_elastic_пароль"
+      JWT_SECRET: "ваш_jwt_секрет"
+    ```
+
+    - если у вас не очень мощный процессор отрегулируйте настройки в `k8s/user-deposit-app-deployment.yaml`:
+   ```yaml
+    resources:
+      requests:
+        cpu: 100m
+      limits:
+        cpu: 500m
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+        target:
+          type: AverageValue
+          averageValue: 10m
+    ```
+
+    - находясь в корне проекта выполните команду:
+      ```bash
+      kubectl apply -f ./k8s/
+      ```
+
+4. Для запуска приложения без `Dockerfile`:
 
    Создайте файл `src/main/resources/secret/secret.properties`.
    `JWT_SECRET` - необязательный дополнительный параметр,
@@ -38,19 +71,19 @@
 
    ```properties
     DB_URL=jdbc:postgresql://localhost:5432/user_deposite_db
-    DB_USER=postgres_логин
-    DB_PASSWORD=postgres_пароль
+    DB_USER=ваш_postgres_юзер
+    DB_PASSWORD=ваш_postgres_пароль
     ES_URIS=http://localhost:9200
-    ES_PASSWORD=elastic_пароль
-    JWT_SECRET=jwt_секрет
+    ES_PASSWORD=ваш_elastic_пароль
+    JWT_SECRET=ваш_jwt_секрет
     ```
    Можете сами создать PostreSQL и Elasticsearch БД или использовать
     ```bash
-    docker-compose-local up -d
+    docker-compose-no-jar up -d
     ```
    запустит только БД PostreSQL и Elasticsearch в Docker.
 
-4. Сборка и запуск приложения без контейнера
+5. Сборка и запуск приложения без контейнера
    (используйте флаг `-Pdocker-image` если хотите собирать Docker-образ с помощью Maven):
     - сборка и запуск тестов
         ```bash
@@ -69,7 +102,7 @@
       java -jar target/user-deposit-service-0.0.1-SNAPSHOT.jar
       ```
 
-5. Сборка и запуск приложения отдельно в контейнере с помощью Dockerfile без Java и Maven в системе:
+6. Сборка и запуск приложения отдельно в контейнере с помощью Dockerfile без Java и Maven в системе:
     - сборка docker-образа
       ```bash
       docker build -t user-deposit-service:0.0.1-SNAPSHOT .

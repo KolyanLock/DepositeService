@@ -13,7 +13,7 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       start_period: 10s
       timeout: 5s
       retries: 5
@@ -37,7 +37,7 @@ services:
     volumes:
       - es-data:/usr/share/elasticsearch/data
     healthcheck:
-      test: [ "CMD-SHELL", "[ $$(curl -s -o /dev/null -w '%{http_code}' -u elastic:$${ELASTIC_PASSWORD} http://localhost:9200) = 200 ]" ]
+      test: [ "CMD-SHELL", "curl --silent --fail -u elastic:$${ELASTIC_PASSWORD} http://localhost:9200/_cluster/health || exit 1" ]
       start_period: 30s
       timeout: 5s
       retries: 5
@@ -45,7 +45,7 @@ services:
     restart: unless-stopped
 
   user-deposit-app:
-    image: user-deposit-service:${VERSION}
+    image: user-deposit-service:0.0.1-SNAPSHOT
     build:
       context: .
       dockerfile: Dockerfile

@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out ./k8s/
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: user-deposit-app
+  name: jar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: user-deposit-app
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out ./k8s/
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: user-deposit-app
+    spec:
+      initContainers:
+        - name: wait-for-dependencies
+          image: busybox:1.37
+          envFrom:
+            - configMapRef:
+                name: user-deposit-config
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for PostgreSQL at $DB_HOST:$DB_PORT..."
+              until nc -z "$DB_HOST" "$DB_PORT"; do
+                echo "Postgres not ready..."
+                sleep 3
+              done
+              
+              echo "Waiting for Elasticsearch at $ES_HOST:$ES_PORT..."
+              until nc -z "$ES_HOST" "$ES_PORT"; do
+                echo "Elasticsearch not ready..."
+                sleep 3
+              done
+              
+              echo "All dependencies are up!"    
+
+      containers:
+        - name: user-deposit-app
+          image: user-deposit-service:0.0.1-SNAPSHOT
+          envFrom:
+            - configMapRef:
+                name: user-deposit-config
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              cpu: 500m
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+      restartPolicy: Always
+
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-deposit-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: jar
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: AverageValue
+          averageValue: 10m
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 10
+    scaleDown:
+      stabilizationWindowSeconds: 10
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 10

@@ -33,6 +33,7 @@ build/
 .vscode/
 
 ### Added ###
+secret/
 /.env
-/src/main/resources/secret/
-/k8s/
+*secrets*.properties
+*secrets*.yaml
